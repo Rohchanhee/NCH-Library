@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>도서 목록 조회</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:hover { background-color: #f5f5f5; }
+    </style>
+</head>
+<body>
+<h1>도서 목록</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>ISBN</th>
+        <th>서명</th>
+        <th>권</th>
+        <th>저자</th>
+        <th>출판사</th>
+        <th>출판년도</th>
+        <th>KDC</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${books}">
+        <td th:text="${book.id}"></td>
+        <td th:text="${book.isbn}"></td>
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.volume}"></td>
+        <td th:text="${book.author}"></td>
+        <td th:text="${book.publisher}"></td>
+        <td th:text="${book.pubYear}"></td>
+        <td th:text="${book.kdc}">.7</td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(books)}">
+        <td colspan="7">등록된 도서가 없습니다.</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

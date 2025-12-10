@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Book CRUD</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    button { margin: 2px; }
+  </style>
+</head>
+<body>
+<h1>API TEST</h1>
+
+<!-- 등록 폼 -->
+<h2>새 책 등록</h2>
+<form id="bookForm" onsubmit="createBook(); return false;">
+  <input type="text" id="title" placeholder="제목" required/>
+  <input type="text" id="author" placeholder="저자" required/>
+  <input type="text" id="publisher" placeholder="출판사" required/>
+  <input type="text" id="isbn" placeholder="ISBN" required/>
+  <button type="submit">등록</button>
+</form>
+
+<hr/>
+
+<!-- 책 목록 테이블 -->
+<h2>책 목록</h2>
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>제목</th>
+    <th>저자</th>
+    <th>출판사</th>
+    <th>ISBN</th>
+    <th>수정</th>
+    <th>삭제</th>
+  </tr>
+  </thead>
+  <tbody id="bookList">
+  </tbody>
+</table>
+
+<script>
+  const API_URL = "http://localhost:8080/api/books";
+
+  // 전체 책 조회
+  async function loadBooks() {
+      const res = await fetch(API_URL);
+      const books = await res.json();
+      const tbody = document.getElementById("bookList");
+      tbody.innerHTML = "";
+      books.forEach(book => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+              <td>${book.id}</td>
+              <td>${book.title}</td>
+              <td>${book.author}</td>
+              <td>${book.publisher}</td>
+              <td>${book.isbn}</td>
+              <td><button onclick="editBook(${book.id}, '${book.title}', '${book.author}', '${book.publisher}', '${book.isbn}')">수정</button></td>
+              <td><button onclick="deleteBook(${book.id})">삭제</button></td>
+          `;
+          tbody.appendChild(tr);
+      });
+  }
+
+  // 등록
+  async function createBook() {
+      const book = {
+          title: document.getElementById("title").value,
+          author: document.getElementById("author").value,
+          publisher: document.getElementById("publisher").value,
+          isbn: document.getElementById("isbn").value
+      };
+      await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(book)
+      });
+      document.getElementById("bookForm").reset();
+      loadBooks();
+  }
+
+  // 삭제
+  async function deleteBook(id) {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      loadBooks();
+  }
+
+  // 수정
+  async function editBook(id, title, author, publisher, isbn) {
+      const newTitle = prompt("새 제목 입력:", title);
+      if (!newTitle) return;
+      const updatedBook = { title: newTitle, author, publisher, isbn };
+      await fetch(`${API_URL}/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedBook)
+      });
+      loadBooks();
+  }
+
+  // 초기 로드
+  loadBooks();
+</script>
+</body>
+</html>
