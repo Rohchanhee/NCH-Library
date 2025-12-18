@@ -9,9 +9,12 @@ import com.nch.bookmanager.repository.RentalRecordRepository;
 import com.nch.bookmanager.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.nch.bookmanager.dto.UserPreferenceDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -20,6 +23,10 @@ public class RentalService {
     private final RentalRecordRepository rentalRecordRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+
+
+    private static final int PREFERENCE_LIMIT = 5;
+
 
     public RentalService(RentalRecordRepository rentalRecordRepository,
                          BookRepository bookRepository,
@@ -99,6 +106,51 @@ public class RentalService {
                 .dueDate(record.getDueDate())
                 .returnDate(record.getReturnDate())
                 .build();
+    }
+
+
+
+
+    // ===============================================
+    //           [수정] 사용자 선호 정보 조회 (빈도수 Map 반환)
+    // ===============================================
+
+    /**
+     * 사용자의 과거 대출 기록을 분석하여 선호하는 저자, 출판사, KDC 빈도수 정보를 반환
+     */
+    @Transactional(readOnly = true)
+    public UserPreferenceDto getUserPreferences(String username) {
+
+        // Repository에서 [특징, 빈도수] List<Object[]> 형태로 데이터를 조회
+        List<Object[]> authorCountsList = rentalRecordRepository.findAuthorCountsByUsername(username);
+        List<Object[]> publisherCountsList = rentalRecordRepository.findPublisherCountsByUsername(username);
+        List<Object[]> kdcCountsList = rentalRecordRepository.findKDCCountsByUsername(username);
+
+        // Map<String, Long>으로 변환
+        Map<String, Long> authorCounts = convertCountsListToMap(authorCountsList);
+        Map<String, Long> publisherCounts = convertCountsListToMap(publisherCountsList);
+        Map<String, Long> kdcCounts = convertCountsListToMap(kdcCountsList);
+
+
+        return UserPreferenceDto.builder()
+                .username(username)
+                .authorCounts(authorCounts)
+                .publisherCounts(publisherCounts)
+                .kdcCounts(kdcCounts)
+                .build();
+    }
+
+    /**
+     * List<Object[]> 형태의 쿼리 결과를 Map<String, Long>으로 변환하는 헬퍼 메서드
+     * Object[0] = String (특징), Object[1] = Long (빈도수)
+     */
+    private Map<String, Long> convertCountsListToMap(List<Object[]> countsList) {
+        return countsList.stream()
+                // Object[]를 <String, Long>으로 매핑
+                .collect(Collectors.toMap(
+                        arr -> (String) arr[0], // Key: 특징 (String)
+                        arr -> (Long) arr[1]    // Value: 빈도수 (Long)
+                ));
     }
 
 }

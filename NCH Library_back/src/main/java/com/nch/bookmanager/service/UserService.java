@@ -18,11 +18,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * 회원가입 로직
-     * @param requestDto (회원가입 시 입력받은 DTO)
-     * @return User (저장된 User 엔티티)
-     */
+
     public User registerNewUser(UserRegisterRequestDto requestDto) {
 
         String encryptedPassword = passwordEncoder.encode(requestDto.getPassword());

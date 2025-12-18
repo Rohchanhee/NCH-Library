@@ -66,4 +66,33 @@ public class BookRestController {
     public Book getRandomBook() {
         return bookService.getRandomBook();
     }
+
+    // ===============================================
+    //           [추가] 통계 기반 추천 API
+    // ===============================================
+
+    /**
+     * 전체 기간 인기 도서 추천 (가장 많이 대출된 도서)
+     */
+    @GetMapping("/recommend/popular")
+    public List<Book> getPopularBooks() {
+        return bookService.getPopularBooks();
+    }
+
+    /**
+     * 최근 1주일 급상승 도서 추천 (최근 많이 대출된 도서)
+     */
+    @GetMapping("/recommend/trending")
+    public List<Book> getTrendingBooks() {
+        return bookService.getTrendingBooks();
+    }
+
+    /**
+     * 신간 도서 추천 (가장 최근에 출판된 도서)
+     */
+    @GetMapping("/recommend/new-release")
+    public List<Book> getNewReleaseBooks() {
+        return bookService.getNewReleaseBooks();
+    }
+
 }

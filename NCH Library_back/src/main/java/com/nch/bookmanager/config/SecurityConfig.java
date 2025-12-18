@@ -120,7 +120,6 @@ public class SecurityConfig {
                                 "/*.json",          // manifest 파일 등
                                 "/*.png",           // 이미지
 
-                                // 리액트 라우터 경로들도 허용해야 새로고침했을 때 403이 안 뜹니다.
                                 "/login", "/register", "/my", "/books", "/admin/**", "/guide"
                         ).permitAll()
 

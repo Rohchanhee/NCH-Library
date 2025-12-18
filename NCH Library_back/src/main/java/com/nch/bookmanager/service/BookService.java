@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -17,6 +18,8 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final RentalRecordRepository rentalRecordRepository;
+
+    private final int RECOMMENDATION_LIMIT = 5;
 
     @Autowired
     public BookService(BookRepository bookRepository, RentalRecordRepository rentalRecordRepository) {
@@ -56,10 +59,8 @@ public class BookService {
 
     // 삭제
     public void deleteBook(Long id) {
-        // 1. 이 책에 딸린 대출 기록을 먼저 싹 지운다.
         rentalRecordRepository.deleteByBookId(id);
 
-        // 2. 그 다음 책을 지운다.
         Book book = findBookById(id);
         bookRepository.delete(book);
     }
@@ -93,4 +94,38 @@ public class BookService {
         int randomIndex = (int) (Math.random() * allBooks.size());
         return allBooks.get(randomIndex);
     }
+
+    /**
+     * 전체 기간 동안 가장 많이 대출된 도서 (인기 도서) 추천
+     */
+    public List<Book> getPopularBooks() {
+        List<Long> bookIds = rentalRecordRepository.findPopularBookIds(RECOMMENDATION_LIMIT);
+
+        // ID 리스트를 이용해 실제 Book 엔티티 리스트를 조회합니다.
+        return bookRepository.findAllById(bookIds);
+    }
+
+    /**
+     * 최근 1주일간 가장 많이 대출된 도서 (급상승 도서) 추천
+     */
+    public List<Book> getTrendingBooks() {
+        // 1주일 전 시간 계산
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
+
+        List<Long> bookIds = rentalRecordRepository.findTrendingBookIds(RECOMMENDATION_LIMIT, oneWeekAgo);
+
+        // ID 리스트를 이용해 실제 Book 엔티티 리스트를 조회합니다.
+        return bookRepository.findAllById(bookIds);
+    }
+
+    /**
+     * 최신 출판된 도서 (신간 도서) 추천
+     * (pubYear 기준으로 내림차순 정렬)
+     */
+    public List<Book> getNewReleaseBooks() {
+        // BookRepository에 신간 도서 조회 쿼리를 추가해야 합니다.
+        // 임시로 전체 도서 중 최신 순 10개를 반환하도록 구현합니다.
+        return bookRepository.findNewReleaseBooks(RECOMMENDATION_LIMIT);
+    }
+
 }

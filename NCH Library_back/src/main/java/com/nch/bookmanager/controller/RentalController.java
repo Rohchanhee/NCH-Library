@@ -6,6 +6,8 @@ import com.nch.bookmanager.service.RentalService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import com.nch.bookmanager.dto.UserPreferenceDto;
+
 
 import java.util.List;
 import java.util.Map;
@@ -51,5 +53,23 @@ public class RentalController {
         String username = authentication.getName();
         List<RentalRecordDto> rentals = rentalService.getMyRentals(username);
         return ResponseEntity.ok(rentals);
+    }
+
+
+
+
+
+    // ===============================================
+    //           [추가] 사용자 선호 정보 조회 API
+    // ===============================================
+
+    /**
+     * 현재 로그인한 사용자의 선호 정보(Top Authors, Publishers, KDCs)를 조회
+     */
+    @GetMapping("/my/preferences")
+    public ResponseEntity<UserPreferenceDto> getMyPreferences(Authentication authentication) {
+        String username = authentication.getName();
+        UserPreferenceDto preferences = rentalService.getUserPreferences(username);
+        return ResponseEntity.ok(preferences);
     }
 }

@@ -47,4 +47,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     //랜덤 책
     @Query(value = "SELECT * FROM book ORDER BY RAND() LIMIT 1", nativeQuery = true)
     Book findRandomBook();
+
+
+    /**
+     * 최신 출판 연도 (pubYear) 순으로 도서를 조회
+     * (pubYear 필드를 기준으로 내림차순 정렬)
+     */
+    @Query(value = "SELECT * FROM book ORDER BY pub_year DESC LIMIT :limit", nativeQuery = true)
+    List<Book> findNewReleaseBooks(@Param("limit") int limit);
 }
