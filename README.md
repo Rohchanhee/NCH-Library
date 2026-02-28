@@ -4,6 +4,7 @@
 도서의 등록, 검색, 대출/반납 기능을 제공하고, 나아가 생성형 AI(Gemini)와 **자체 개발한 벡터 유사도 알고리즘**을 통해 개인화된 도서 추천 경험을 제공합니다.
 
 배포 주소: http://nch-library-env.eba-ytcms3a3.ap-south-1.elasticbeanstalk.com/
+(2026-02 배포중단)
 
 ---
 
